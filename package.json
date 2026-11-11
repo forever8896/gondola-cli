@@ -1,0 +1,11 @@
+{
+  "name": "gondola-cli",
+  "version": "0.1.0",
+  "description": "Explore a change to your repo as many variants at once, each built by an agent in its own Boat sandbox.",
+  "type": "module",
+  "license": "MIT",
+  "bin": { "gondola": "src/cli.ts" },
+  "scripts": { "gondola": "bun src/cli.ts", "typecheck": "bunx tsc --noEmit" },
+  "engines": { "bun": ">=1.3" },
+  "devDependencies": { "@types/bun": "latest", "typescript": "^5" }
+}

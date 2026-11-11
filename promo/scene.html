@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>gondola-cli promo scene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* A deterministic scene: nothing here animates on its own. render(t) sets every moving value from the time t. */
+  :root { --ink:#111; --grey:#8c8c8c; --grey-2:#b3b3b3; --hair:#e5e5e5; --hair-2:#ececec; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; width:1920px; height:1200px; overflow:hidden; background:#fff; }
+  body { color:var(--ink); font:400 20px/1.45 'Inter Tight', system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  #stage { position:relative; width:1920px; height:1200px; overflow:hidden; }
+  #stage > * { position:absolute; will-change:transform, opacity; }
+  .mono { font-family:'JetBrains Mono', ui-monospace, monospace; }
+
+  #logo { left:80px; top:38px; height:30px; }
+
+  /* origin */
+  #o-kicker { left:0; top:64px; width:1920px; text-align:center; font-size:26px; color:var(--grey); letter-spacing:.01em; }
+  #o-card { left:288px; top:128px; width:1344px; height:840px; border-radius:16px; overflow:hidden; background:#fff;
+    box-shadow:0 0 0 1px var(--hair), 0 50px 100px -40px rgba(0,0,0,.4); }
+  #o-card img { width:100%; height:100%; display:block; }
+
+  /* pivot */
+  #pivot { left:0; top:0; width:1920px; height:1200px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  #p-brand { display:flex; align-items:center; gap:18px; margin-bottom:70px; }
+  #p-brand img { height:64px; }
+  #p-brand span { font:500 30px/1 'JetBrains Mono', monospace; padding:10px 16px; border-radius:12px; background:var(--ink); color:#fff; transform:translateY(6px); }
+  #p-1 { font-size:44px; color:var(--grey); letter-spacing:-.02em; }
+  #p-2 { font-size:76px; font-weight:500; letter-spacing:-.035em; line-height:1.08; margin-top:22px; }
+
+  /* terminal */
+  #term { background:#151515; border-radius:16px; overflow:hidden; color:#e9e6e1; display:flex; flex-direction:column;
+    box-shadow:0 0 0 1px rgba(0,0,0,.6), 0 50px 110px -40px rgba(0,0,0,.55); font:400 21px/34px 'JetBrains Mono', ui-monospace, monospace; }
+  #t-bar { flex:none; height:46px; display:flex; align-items:center; padding:0 18px; gap:9px; background:#1d1d1d; border-bottom:1px solid #262626; }
+  #t-bar i { width:13px; height:13px; border-radius:50%; background:#3a3a3a; }
+  #t-bar span { margin-left:14px; font-size:16px; color:#7d7d7d; }
+  #t-body { flex:1; min-height:0; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end; padding:0 30px 12px;
+    -webkit-mask-image:linear-gradient(transparent 4px, #000 56px); mask-image:linear-gradient(transparent 4px, #000 56px); }
+  .ln { display:grid; grid-template-rows:0fr; }
+  .ln > div { min-height:0; overflow:hidden; white-space:pre-wrap; overflow-wrap:anywhere; }
+  .ln.out > div { white-space:pre; text-overflow:ellipsis; color:#8f8c87; }
+  .ln.gap > div::before { content:''; display:block; height:17px; }
+  .ln .dim { color:#8f8c87; } .ln .ok { color:#74c98a; } .ln .hl { color:#e9e6e1; } .ln .or { color:#e08a5f; }
+  .ln.user > div { color:#b9b5ae; }
+  #t-input { flex:none; margin:0 22px 14px; border:1px solid #3b3b3b; border-radius:12px; padding:13px 18px; min-height:62px; display:flex; gap:12px; }
+  #t-input b { font-weight:400; color:#8f8c87; }
+  #t-caret { display:inline-block; width:12px; height:25px; background:#e9e6e1; vertical-align:-5px; margin-left:1px; }
+  #t-hint { flex:none; padding:0 40px 16px; font-size:15px; line-height:20px; color:#5d5d5d; }
+
+  /* diagram */
+  #step { left:1110px; top:104px; width:760px; font-size:38px; font-weight:500; letter-spacing:-.03em; line-height:1.1; }
+  #step small { display:block; font:500 17px/1 'JetBrains Mono', monospace; color:var(--grey); letter-spacing:.04em; margin-bottom:14px; }
+  .chip { border-radius:14px; background:#fff; box-shadow:0 0 0 1px var(--hair), 0 14px 30px -20px rgba(0,0,0,.35); }
+  #repo { left:1110px; top:236px; width:236px; height:104px; padding:22px 22px; display:flex; flex-direction:column; justify-content:center; }
+  #repo b { font-weight:500; font-size:23px; letter-spacing:-.02em; }
+  #repo span { font-size:15px; color:var(--grey); }
+  #base { left:1450px; top:236px; width:410px; height:104px; padding:16px 20px; }
+  #base b { display:block; font:500 16px/1 'JetBrains Mono', monospace; color:var(--grey); letter-spacing:.03em; }
+  #base ul { display:flex; gap:8px; list-style:none; margin:16px 0 0; padding:0; }
+  #base li { font-size:15px; padding:6px 11px; border-radius:99px; background:#f4f4f4; color:var(--grey-2); white-space:nowrap; }
+  #wires { left:0; top:0; width:1920px; height:1200px; pointer-events:none; }
+  #wires path { fill:none; stroke:#cfcfcf; stroke-width:2; stroke-linecap:round; }
+  #pulse { width:14px; height:14px; border-radius:50%; background:var(--ink); margin:-7px 0 0 -7px; }
+
+  /* tiles: the same seven frames are the forks in the diagram and the tiles on the wall */
+  .tile { position:absolute; left:0; top:0; will-change:transform, opacity; }
+  .tframe { position:relative; width:100%; overflow:hidden; background:#f5f5f5; border-radius:10px; box-shadow:0 0 0 1px var(--hair), 0 16px 32px -20px rgba(0,0,0,.35); }
+  .tframe img { position:absolute; left:0; top:0; width:100%; height:auto; display:block; will-change:transform, filter, opacity; }
+  .tframe .work { position:absolute; left:8px; bottom:8px; max-width:calc(100% - 16px); padding:4px 9px; border-radius:6px; background:rgba(17,17,17,.82); color:#fff;
+    font:13px/1.5 'JetBrains Mono', monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tframe .tick { position:absolute; right:9px; top:9px; width:26px; height:26px; border-radius:50%; background:var(--ink); display:grid; place-items:center; box-shadow:0 0 0 3px rgba(255,255,255,.9); }
+  .dlabel { position:absolute; left:0; right:0; }
+  .dlabel b { display:block; font-weight:500; font-size:18px; letter-spacing:-.015em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dlabel span { position:absolute; left:0; right:0; top:26px; font-size:15px; color:var(--grey); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dlabel span.patch { font:14px/1.6 'JetBrains Mono', monospace; color:var(--ink); }
+  .wlabel { position:absolute; left:0; right:0; }
+  .wlabel .meta { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .wlabel .meta b { font-weight:500; font-size:22px; letter-spacing:-.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wlabel .meta i { font-style:normal; font-size:15px; color:var(--grey-2); }
+  .wlabel .sub { font-size:15px; color:var(--grey); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+  .wlabel .quote { font-size:18px; line-height:1.3; letter-spacing:-.01em; margin-top:9px; height:47px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .wlabel .acts { display:flex; align-items:center; gap:9px; margin-top:13px; }
+  .wlabel .stat { margin-left:auto; font-size:14px; color:var(--grey-2); font-variant-numeric:tabular-nums; }
+  .wlabel .plain { font-size:16px; color:var(--grey); margin-top:9px; }
+  .btn { display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(0,0,0,.1); background:#fff; padding:8px 16px; border-radius:99px; font-size:16px; line-height:1.3; white-space:nowrap; }
+  .btn.dark { background:var(--ink); color:#fff; border-color:var(--ink); padding-left:13px; }
+  .btn.big { padding:14px 26px 14px 20px; font-size:19px; }
+  .now .meta b { color:var(--grey); }
+
+  /* wall chrome */
+  #w-run { right:80px; top:42px; font-size:17px; color:var(--grey); }
+  #w-run b { font-weight:400; color:var(--ink); }
+  #w-head { left:80px; top:100px; width:1500px; }
+  #w-head h1 { margin:0; font-weight:500; font-size:36px; line-height:1.16; letter-spacing:-.028em; max-width:1180px; }
+  #w-head ul { display:flex; gap:26px; list-style:none; margin:14px 0 0; padding:0; font-size:17px; color:var(--grey); }
+  #w-head ul b { font-weight:400; color:var(--ink); }
+
+  /* detail */
+  #veil { left:0; top:0; width:1920px; height:1200px; background:#fff; }
+  #dlg { left:180px; top:56px; width:1560px; height:976px; border-radius:16px; overflow:hidden; background:#fff; display:grid; grid-template-columns:1130px 430px;
+    box-shadow:0 0 0 1px rgba(0,0,0,.08), 0 50px 110px -34px rgba(0,0,0,.5); }
+  #d-view { position:relative; background:#f5f5f5; overflow:hidden; }
+  #d-seg { position:absolute; left:50%; top:22px; transform:translateX(-50%); z-index:2; display:flex; padding:4px; border-radius:99px; background:rgba(255,255,255,.94); box-shadow:0 0 0 1px var(--hair), 0 6px 18px -10px rgba(0,0,0,.3); font-size:15px; }
+  #d-seg span { padding:6px 18px; border-radius:99px; color:var(--grey); } #d-seg span.on { background:var(--ink); color:#fff; }
+  #d-img { position:absolute; left:65px; top:86px; width:1000px; height:auto; border-radius:10px; box-shadow:0 0 0 1px var(--hair), 0 24px 50px -28px rgba(0,0,0,.4); will-change:transform; }
+  #d-side { display:flex; flex-direction:column; border-left:1px solid var(--hair); }
+  #d-top { padding:22px 34px 0; font-size:15px; color:var(--grey); display:flex; justify-content:space-between; }
+  #d-body { flex:1; padding:14px 34px 0; }
+  #d-body h2 { margin:0; font-weight:500; font-size:36px; letter-spacing:-.03em; line-height:1.1; }
+  #d-body .sub { font-size:16px; color:var(--grey); margin-top:8px; }
+  #d-body .quote { font-size:26px; line-height:1.22; letter-spacing:-.015em; margin-top:26px; }
+  #d-body .txt { font-size:17px; color:#444; margin-top:18px; line-height:1.45; }
+  #d-body h3 { margin:30px 0 8px; font-size:13px; font-weight:500; letter-spacing:.07em; text-transform:uppercase; color:var(--grey); }
+  #d-body .file { font:15px/1.5 'JetBrains Mono', monospace; color:#555; border-top:1px solid var(--hair-2); padding-top:9px; }
+  #d-foot { border-top:1px solid var(--hair); padding:20px 34px 26px; display:flex; flex-direction:column; gap:15px; }
+  #d-cmd { font:15px/1.4 'JetBrains Mono', monospace; color:#555; background:#f6f6f6; border-radius:10px; padding:12px 14px; white-space:nowrap; }
+  #d-foot .row { display:flex; align-items:center; gap:20px; font-size:16px; color:var(--grey); }
+
+  /* apply: before and after */
+  #ba { left:1110px; top:270px; width:750px; }
+  #ba .bar { height:40px; border-radius:12px 12px 0 0; background:#f3f3f3; box-shadow:0 0 0 1px var(--hair); display:flex; align-items:center; justify-content:space-between; padding:0 16px; font:14px/1 'JetBrains Mono', monospace; color:var(--grey); }
+  #ba .scr { position:relative; height:469px; overflow:hidden; border-radius:0 0 12px 12px; box-shadow:0 0 0 1px var(--hair), 0 30px 60px -34px rgba(0,0,0,.45); background:#111; }
+  #ba .scr img { position:absolute; left:0; top:0; width:100%; height:auto; }
+  #ba-line { position:absolute; top:0; bottom:0; width:3px; margin-left:-1.5px; background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,.25); }
+  #ba-note { margin-top:20px; font-size:19px; color:var(--grey); }
+  #ba-note b { font-weight:400; color:var(--ink); font-family:'JetBrains Mono', monospace; font-size:17px; }
+
+  /* end */
+  #end { left:0; top:0; width:1920px; height:1200px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  #e-brand { display:flex; align-items:center; gap:18px; }
+  #e-brand img { height:72px; }
+  #e-brand span { font:500 32px/1 'JetBrains Mono', monospace; padding:11px 17px; border-radius:12px; background:var(--ink); color:#fff; transform:translateY(7px); }
+  #e-1 { font-size:74px; font-weight:500; letter-spacing:-.035em; line-height:1.06; margin-top:66px; }
+  #e-2 { font-size:74px; font-weight:500; letter-spacing:-.035em; line-height:1.06; color:var(--grey-2); }
+  #e-cmd { margin-top:64px; font:22px/1 'JetBrains Mono', monospace; padding:20px 28px; border-radius:14px; background:#151515; color:#e9e6e1; }
+  #e-cmd i { font-style:normal; color:#8f8c87; }
+  #e-foot { margin-top:34px; font-size:20px; color:var(--grey); }
+
+  #cap { left:0; top:1092px; width:1920px; display:flex; justify-content:center; }
+  #cap span { background:var(--ink); color:#fff; font-size:27px; letter-spacing:-.01em; padding:14px 28px; border-radius:16px; box-shadow:0 20px 44px -18px rgba(0,0,0,.5); }
+  #cap code { font:22px 'JetBrains Mono', monospace; color:rgba(255,255,255,.62); margin-left:14px; }
+  #cursor { left:0; top:0; filter:drop-shadow(0 3px 5px rgba(0,0,0,.35)); }
+  #cursor i { position:absolute; left:-20px; top:-20px; width:40px; height:40px; border-radius:50%; border:2.5px solid #111; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <img id="logo" src="../kit/logo.png" alt="">
+
+  <div id="o-kicker">How it started</div>
+  <div id="o-card"><img id="o-img" alt=""></div>
+
+  <div id="pivot">
+    <div id="p-brand"><img src="../kit/logo.png" alt=""><span>cli</span></div>
+    <div id="p-1">It read a URL and gave you a page.</div>
+    <div id="p-2">Now it reads your repo<br>and gives you a diff.</div>
+  </div>
+
+  <div id="step"></div>
+  <div id="repo" class="chip"><b>slop-academy</b><span>your repo · 64 files</span></div>
+  <div id="base" class="chip"><b>BASE SANDBOX · boat.dev</b><ul><li>files</li><li>installed</li><li>dev server</li><li>snapshot</li></ul></div>
+  <svg id="wires" viewBox="0 0 1920 1200"></svg>
+  <div id="pulse"></div>
+
+  <img id="w-logo-spacer" style="display:none" alt="">
+  <div id="w-run"><b>slop-academy/site</b> · run 672be293</div>
+  <div id="w-head">
+    <h1>Rework the hero and the section right after it so a developer who feels rusty after a year of shipping with AI gets it in five seconds</h1>
+    <ul><li><b>6 of 6</b> variants</li><li>in your design system</li><li>copy rewritten per variant</li><li>claude-sonnet-5-5</li><li>5 min 8 s</li></ul>
+  </div>
+
+  <div id="tiles" style="left:0;top:0;width:1920px;height:1200px"></div>
+
+  <div id="veil"></div>
+  <div id="dlg">
+    <div id="d-view"><div id="d-seg"><span class="on">Desktop</span><span>Phone</span></div><img id="d-img" src="assets/run/hi-v3.jpg" alt=""></div>
+    <div id="d-side">
+      <div id="d-top"><span>Variant 3 of 6</span><span>←&nbsp;&nbsp;→&nbsp;&nbsp;✕</span></div>
+      <div id="d-body">
+        <h2>One Big Question</h2>
+        <div class="sub">Single statement · Problem led, dry and precise</div>
+        <div class="quote">“You shipped it. Can you still explain it?”</div>
+        <div class="txt">A single enormous headline fills the hero, with a quiet problem, answer and install row and the replayed demo aligned beneath it on the same grid.</div>
+        <h3>1 file changed, 66 insertions(+), 28 deletions(-)</h3>
+        <div class="file">site/index.html</div>
+      </div>
+      <div id="d-foot">
+        <div id="d-cmd">gondola apply 3 --run 672be293</div>
+        <div class="row"><span class="btn dark big" id="d-apply"><svg viewBox="0 0 16 16" width="17" height="17"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="d-apply-t">Apply this variant</span></span><span>View patch</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="term">
+    <div id="t-bar"><i></i><i></i><i></i><span>claude · ~/slop-academy</span></div>
+    <div id="t-body"></div>
+    <div id="t-input"><b>&gt;</b><div><span id="t-typed"></span><span id="t-caret"></span></div></div>
+    <div id="t-hint">? for shortcuts</div>
+  </div>
+
+  <div id="ba">
+    <div class="bar"><span>site/index.html</span><span id="ba-tag">before</span></div>
+    <div class="scr"><img src="assets/run/hi-orig.jpg" alt=""><img id="ba-after" src="assets/run/hi-v3.jpg" alt=""><div id="ba-line"></div></div>
+    <div id="ba-note"><b>+66 −28</b> · one file · nothing committed until you say so</div>
+  </div>
+
+  <div id="end">
+    <div id="e-brand"><img src="../kit/logo.png" alt=""><span>cli</span></div>
+    <div id="e-1">Many versions of one change.</div>
+    <div id="e-2">Pick one. It’s a patch.</div>
+    <div id="e-cmd"><i>$</i> gondola explore "&lt;task&gt;" -n 6 --copy</div>
+    <div id="e-foot">open source · runs on your Claude plan · built on boat.dev</div>
+  </div>
+
+  <div id="cap"><span id="cap-t"></span></div>
+  <div id="cursor"><i id="ripple"></i><svg width="38" height="38" viewBox="0 0 24 24"><path d="M4 2 L4 19 L8.6 14.9 L11.6 21.6 L14.6 20.3 L11.6 13.6 L17.8 13.4 Z" fill="#111" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/></svg></div>
+</div>
+
+<script>
+const DURATION = 49.6;
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, x) => a + (b - a) * x;
+const eio = x => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const eo = x => 1 - Math.pow(1 - x, 3);
+const eo5 = x => 1 - Math.pow(1 - x, 5);
+const win = (t, a, b, d = .35) => Math.min(seg(t, a, a + d), 1 - seg(t, b - d, b));   // 1 inside [a, b], soft edges
+const show = (el, o) => { el.style.opacity = o; el.style.visibility = o <= 0.001 ? 'hidden' : 'visible'; };
+const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+// ---------- the run this film shows (real data from .gondola/672be293 in slop-academy) ----------
+const V = [
+  { n: 1, comp: 'Stacked cards', copy: 'Proof led, warm and direct', name: 'Proof Deck', q: 'So you’re not the only one. Talk through the code you shipped.', add: 125, del: 31, sec: 307, done: 26.3 },
+  { n: 2, comp: 'Spec sheet', copy: 'Hyper specific, editorial', name: 'Spec Sheet', q: 'Rusty after a year of shipping with AI? Defend one file, out loud.', add: 55, del: 16, sec: 233, done: 25.2 },
+  { n: 3, comp: 'Single statement', copy: 'Problem led, dry and precise', name: 'One Big Question', q: 'You shipped it. Can you still explain it?', add: 66, del: 28, sec: 223, done: 24.8 },
+  { n: 4, comp: 'Centred and calm', copy: 'Outcome led, playful', name: 'Calm Single Column', q: 'Rusty after a year of shipping with AI? Get your grip back on the code you shipped.', add: 33, del: 29, sec: 147, done: 23.6 },
+  { n: 5, comp: 'Sticky rail', copy: 'Story led, technical', name: 'Sticky story rail', q: 'You shipped it. Can you explain how it fails?', add: 103, del: 38, sec: 300, done: 25.9 },
+  { n: 6, comp: 'Dense dashboard', copy: 'Question led, bold', name: 'Question Dashboard', q: 'Gone rusty on your own code?', add: 80, del: 32, sec: 219, done: 24.3 },
+];
+
+// ---------- terminal script ----------
+const U1 = 'give me 6 versions of the landing page hero, and vary the copy too';
+const U2 = 'apply 3';
+const pad = s => String(s).padStart(4) + 's  ';
+const L = [];   // { t, kind, html | text, dur }
+const line = (t, kind, html, dur = 0) => L.push({ t, kind, html, dur });
+line(11.9, 'plain', '<span class="or">✻</span> <span class="hl">Claude Code</span>');
+line(11.9, 'plain', '<span class="dim">  cwd: ~/slop-academy</span>');
+line(11.9, 'gap', '');
+line(14.9, 'user', '&gt; ' + esc(U1));
+line(14.9, 'gap', '');
+line(15.25, 'stream', '● I’ll explore that as six variants with gondola. Each one is built in its own sandbox, against your real dev server.', 1.0);
+line(16.35, 'gap', '');
+line(16.5, 'plain', '<span class="ok">●</span> <span class="hl">Bash</span>(gondola explore "Rework the hero and the section right after it…" -n 6 --copy --dir site)');
+const out = (t, s) => line(t, 'out', s);
+out(17.0, '  ⎿ ' + pad(0) + 'base  starting a sandbox for slop-academy/site');
+out(17.5, '    ' + pad(1) + 'base  sending 64 files (1.3 MB)');
+out(18.1, '    ' + pad(7) + 'base  installing');
+out(18.7, '    ' + pad(12) + 'base  starting the dev server');
+out(19.4, '    ' + pad(33) + 'base  dev server answers on port 4173; snapshotting');
+out(20.2, '    ' + pad(35) + 'run   forking 6 sandboxes');
+V.forEach((v, i) => out(21.2 + i * .2, '    ' + pad(39) + `<span class="hl">#${v.n}</span>    agent started · ${v.comp} · ${v.copy}`));
+[...V].sort((a, b) => a.done - b.done).forEach(v => out(v.done, '    ' + pad(v.sec) + `<span class="hl">#${v.n}</span>    <span class="ok">done:</span> ${v.name} <span class="dim">(+${v.add} −${v.del})</span>`));
+line(26.85, 'gap', '');
+line(26.95, 'stream', '● 6 of 6 variants finished in 5 min 8 s. Opening the wall so you can compare them.', .7);
+line(40.0, 'gap', '');
+line(40.0, 'user', '&gt; ' + U2);
+line(40.0, 'gap', '');
+line(40.35, 'plain', '<span class="ok">●</span> <span class="hl">Bash</span>(gondola apply 3 --run 672be293)');
+out(40.95, '  ⎿ Applied variant 3 (One Big Question) to the working tree:');
+out(41.05, '    1 file changed, <span class="ok">66 insertions(+)</span>, <span class="or">28 deletions(-)</span>.');
+out(41.15, '    Nothing is committed. Review with `git diff`.');
+line(41.75, 'gap', '');
+line(41.85, 'stream', '● Variant 3 is in your working tree as an ordinary diff. Want me to run the checks and commit it?', .8);
+const TYPED = [{ a: 12.5, b: 14.5, e: 14.9, s: U1 }, { a: 39.0, b: 39.6, e: 40.0, s: U2 }];
+
+const body = $('t-body');
+for (const l of L) {
+  const w = document.createElement('div'); w.className = 'ln ' + l.kind;
+  const d = document.createElement('div'); if (l.kind !== 'stream') d.innerHTML = l.html;
+  w.append(d); body.append(w); l.el = w; l.inner = d; l.shown = -1;
+}
+
+// ---------- tiles ----------
+const tick = '<svg viewBox="0 0 16 16" width="14" height="14"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const applyIcon = '<svg viewBox="0 0 16 16" width="14" height="14"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const T = [];
+const mk = (i, v) => {
+  const el = document.createElement('div'); el.className = 'tile' + (v ? '' : ' now');
+  el.innerHTML = `<div class="tframe"><img src="assets/run/${v ? 'full' + v.n : 'original-full'}.jpg" alt=""><div class="work"></div><div class="tick">${tick}</div></div>` +
+    (v ? `<div class="dlabel"><b>${v.comp}</b><span class="a">${v.copy}</span><span class="patch">patch.diff  +${v.add} −${v.del}</span></div>` : '') +
+    `<div class="wlabel"><div class="meta"><b>${v ? v.name : 'Current page'}</b><i>${v ? v.n : 'now'}</i></div><div class="sub">${v ? v.comp + ' · ' + v.copy : 'Now'}</div>` +
+    (v ? `<div class="quote">“${v.q}”</div><div class="acts"><span class="btn dark">${applyIcon}Apply</span><span class="btn">Details</span><span class="stat">1 file ${v.add}+ ${v.del}−</span></div>`
+       : `<div class="plain">What every variant started from.</div>`) + `</div>`;
+  $('tiles').append(el);
+  const q = s => el.querySelector(s);
+  T.push({ i, v, el, frame: q('.tframe'), img: q('img'), work: q('.work'), tick: q('.tick'), dl: q('.dlabel'), wl: q('.wlabel') });
+};
+mk(0, null); V.forEach((v, k) => mk(k + 1, v));
+
+// diagram slots (3 x 2) and wall slots (4 x 2)
+const DW = 236, DH = 148, DX = 1110, DGAP = 21;
+const dslot = k => ({ x: DX + (k % 3) * (DW + DGAP), y: 420 + Math.floor(k / 3) * 290, w: DW, h: DH });
+const WW = 419, WH = 250, WGAP = 28;
+const wslot = i => ({ x: 80 + (i % 4) * (WW + WGAP), y: 250 + Math.floor(i / 4) * 438, w: WW, h: WH });
+const BASE = { x: 1655, y: 340 };
+
+// wires from the base sandbox to each fork
+const wires = $('wires');
+wires.innerHTML = `<path id="w-in" d="M1346 288 L1450 288"/>` + V.map((v, k) => { const s = dslot(k), x = s.x + s.w / 2; return `<path class="wf" d="M${BASE.x} ${BASE.y} C ${BASE.x} ${BASE.y + 50}, ${x} ${s.y - 60}, ${x} ${s.y - 6}"/>`; }).join('');
+const WIN = $('w-in'), WF = [...wires.querySelectorAll('.wf')];
+for (const p of [WIN, ...WF]) { p.len = p.getTotalLength(); p.style.strokeDasharray = p.len; }
+
+const STEPS = [
+  [16.9, 18.0, '01', 'Send the repo once'],
+  [18.0, 20.1, '02', 'Install once, then snapshot'],
+  [20.1, 22.0, '03', 'Fork it: one sandbox per variant'],
+  [22.0, 24.3, '04', 'One agent, one direction each'],
+  [24.3, 27.9, '05', 'Each comes back as a patch'],
+];
+const CAPS = [
+  [0.8, 7.4, 'Gondola began as a demo: type a domain, 50 agents redesign it at once.'],
+  [12.2, 15.8, 'Ask your coding agent for options.'],
+  [17.0, 20.0, 'gondola sends your repo to one Boat sandbox and installs it once.'],
+  [20.1, 22.0, 'Then it forks that sandbox, so nothing is installed twice.'],
+  [22.05, 24.3, 'Each agent gets its own layout idea, copy angle and voice.'],
+  [24.35, 27.7, 'Every variant comes back with screenshots and a patch.'],
+  [32.2, 35.5, 'Compare them side by side. Pick one.'],
+  [35.75, 38.0, 'Copied. Paste it in a terminal inside the repo.<code>gondola apply 3 --run 672be293</code>'],
+  [39.2, 44.6, 'It lands in your working tree as an ordinary diff.'],
+];
+const WORK = ['reading index.html', 'editing index.html', 'editing index.html', 'taking screenshots', 'fixing mobile layout', 'writing result.json'];
+
+// origin footage: frames 1..555 of the first Gondola film, from 1.0 s to 19.5 s
+const oimg = $('o-img'); let oLast = 0;
+const pad4 = n => String(n).padStart(4, '0');
+// page scroll inside a wall tile: down and back up
+const wave = p => { p = ((p % 1) + 1) % 1; return p < .07 ? 0 : p < .46 ? eio((p - .07) / .39) : p < .54 ? 1 : p < .93 ? 1 - eio((p - .54) / .39) : 0; };
+
+let applyRect = null;
+
+async function render(t) {
+  // ----- brand mark, top left: away during the centred title cards -----
+  show($('logo'), Math.min(seg(t, .1, .7), 1 - win(t, 7.7, 11.6, .5), 1 - seg(t, 44.8, 45.3)));
+
+  // ----- A. origin -----
+  const oIn = eo(seg(t, .2, 1.0)), oOut = eio(seg(t, 7.3, 8.0));
+  show($('o-kicker'), Math.min(seg(t, .3, .9), 1 - oOut));
+  show($('o-card'), oIn * (1 - oOut));
+  $('o-card').style.transform = `translateY(${lerp(30, 0, oIn) - 40 * oOut}px) scale(${lerp(.97, 1, oIn) - .06 * oOut})`;
+  if (t < 8.1) {
+    // Whole source frames per output frame (1, then 2, then 1), so the 30 fps footage never judders at 60 fps.
+    const f = Math.round(clamp(t - .7, 0, 7) * 60), n = clamp(1 + Math.min(f, 90) + 2 * clamp(f - 90, 0, 210) + Math.max(0, f - 300), 1, 555);
+    if (n !== oLast) { oLast = n; oimg.src = `assets/origin/f${pad4(n)}.jpg`; await oimg.decode().catch(() => {}); }
+  }
+
+  // ----- B. pivot -----
+  const pOut = 1 - seg(t, 11.1, 11.6);
+  show($('pivot'), t > 7.8 && t < 11.7 ? 1 : 0);
+  const pin = (el, a) => { const p = eo(seg(t, a, a + .7)); el.style.opacity = p * pOut; el.style.transform = `translateY(${lerp(26, 0, p)}px)`; };
+  pin($('p-brand'), 8.0); pin($('p-1'), 8.5); pin($('p-2'), 9.4);
+
+  // ----- C / E. terminal -----
+  const tIn = eo(seg(t, 11.5, 12.3)), split = eio(seg(t, 16.0, 17.0)), tOut = eio(seg(t, 27.7, 28.4)), tBack = eo(seg(t, 38.4, 39.1)), tEnd = eio(seg(t, 44.7, 45.3));
+  const tVis = t < 30 ? tIn * (1 - tOut) : tBack * (1 - tEnd);
+  const term = $('term');
+  show(term, tVis);
+  const tx = t < 30 ? lerp(210, 60, split) - 120 * tOut : lerp(-40, 60, tBack) - 100 * tEnd;
+  term.style.left = tx + 'px'; term.style.top = lerp(130, 96, t < 30 ? tIn : 1) + 'px';
+  term.style.width = (t < 30 ? lerp(1500, 1000, split) : 1000) + 'px'; term.style.height = '920px';
+  for (const l of L) {
+    const p = eo(seg(t, l.t, l.t + .16));
+    l.el.style.gridTemplateRows = p + 'fr'; l.el.style.opacity = p;
+    if (l.kind === 'stream') {
+      const n = Math.round(seg(t, l.t, l.t + l.dur) * l.html.length);
+      if (n !== l.shown) { l.shown = n; l.inner.textContent = l.html.slice(0, n); }
+    }
+  }
+  let typed = '';
+  for (const k of TYPED) if (t >= k.a && t < k.e) typed = k.s.slice(0, Math.round(seg(t, k.a, k.b) * k.s.length));
+  $('t-typed').textContent = typed;
+  $('t-caret').style.opacity = Math.floor(t * 1.6) % 2 === 0 || typed ? 1 : .15;
+
+  // ----- C. diagram -----
+  const dia = Math.min(seg(t, 16.6, 17.2), 1 - seg(t, 27.6, 28.1));
+  const stepEl = $('step'); let stepO = 0;
+  for (const [a, b, n, s] of STEPS) { const o = win(t, a, b, .28); if (o > stepO) { stepO = o; if (stepEl.dataset.s !== n) { stepEl.dataset.s = n; stepEl.innerHTML = `<small>${n}</small>${s}`; } } }
+  show(stepEl, stepO * dia); stepEl.style.transform = `translateY(${(1 - stepO) * 10}px)`;
+  const rIn = eo(seg(t, 16.7, 17.3));
+  show($('repo'), rIn * dia); $('repo').style.transform = `translateY(${lerp(20, 0, rIn)}px)`;
+  const bIn = eo(seg(t, 16.95, 17.55));
+  show($('base'), bIn * dia); $('base').style.transform = `translateY(${lerp(20, 0, bIn)}px)`;
+  [17.6, 18.6, 19.45, 20.0].forEach((a, k) => { const li = $('base').querySelectorAll('li')[k], p = seg(t, a, a + .25); li.style.background = p > 0 ? `rgba(17,17,17,${p})` : '#f4f4f4'; li.style.color = p > .5 ? '#fff' : '#b3b3b3'; });
+  show(wires, dia);
+  WIN.style.strokeDashoffset = WIN.len * (1 - seg(t, 17.1, 17.5));
+  WF.forEach((p, k) => { p.style.strokeDashoffset = p.len * (1 - eo(seg(t, 20.15 + k * .1, 20.75 + k * .1))); });
+  const pu = seg(t, 17.5, 18.05);                       // the repo travelling to the sandbox
+  show($('pulse'), pu > 0 && pu < 1 ? dia : 0); $('pulse').style.transform = `translate(${lerp(1346, 1450, eio(pu))}px, 288px)`;
+
+  // ----- tiles: forks in the diagram, then the wall -----
+  const wallOut = 1 - seg(t, 38.0, 38.5);
+  for (const k of T) {
+    const { v, i } = k;
+    let x, y, w, h, o;
+    const ws = wslot(i);
+    if (!v) { ({ x, y, w, h } = ws); o = seg(t, 29.0, 29.6); show(k.work, 0); show(k.tick, 0); }
+    else {
+      const ds = dslot(i - 1), a = 20.25 + (i - 1) * .1;
+      const f = eo5(seg(t, a, a + .75)), m = eio(seg(t, 28.0 + (i - 1) * .05, 29.15 + (i - 1) * .05));
+      const fx = lerp(BASE.x - 30, ds.x, f), fy = lerp(BASE.y - 10, ds.y, f), fw = lerp(60, ds.w, f), fh = lerp(38, ds.h, f);
+      x = lerp(fx, ws.x, m); y = lerp(fy, ws.y, m); w = lerp(fw, ws.w, m); h = lerp(fh, ws.h, m);
+      o = seg(t, a, a + .25);
+      // the page appearing while the agent works, then sharp when it is done
+      const started = 21.3 + (i - 1) * .2, prog = seg(t, started + .3, v.done), dn = seg(t, v.done, v.done + .3);
+      k.img.style.opacity = clamp(prog * 1.6);
+      k.img.style.filter = prog < 1 ? `blur(${lerp(16, 3, prog)}px) saturate(${lerp(.3, .9, prog)})` : 'none';
+      const working = t > started && t < v.done;
+      show(k.work, working ? Math.min(seg(t, started, started + .2), 1) * (1 - m) : 0);
+      if (working) { const s = WORK[Math.min(WORK.length - 1, Math.floor(prog * WORK.length))]; if (k.work.textContent !== s) k.work.textContent = s; }
+      show(k.tick, dn * (1 - seg(t, 28.0, 28.5))); k.tick.style.transform = `scale(${lerp(.4, 1, eo5(dn))})`;
+      // labels under the fork
+      show(k.dl, Math.min(seg(t, started - .1, started + .2), 1 - seg(t, 27.8, 28.2)));
+      k.dl.style.top = (h + 12) + 'px';
+      k.dl.querySelector('.a').style.opacity = 1 - dn; k.dl.querySelector('.patch').style.opacity = dn;
+      if (i === 3) y -= 5 * eo(seg(t, 31.0, 31.25)) * (1 - seg(t, 31.6, 31.9));
+    }
+    k.el.style.transform = `translate(${x}px, ${y}px)`; k.el.style.width = w + 'px';
+    k.frame.style.height = h + 'px';
+    k.frame.style.boxShadow = v && i === 3 && t > 31.0 && t < 31.9 ? '0 0 0 1.5px #111, 0 24px 46px -22px rgba(0,0,0,.5)' : '';
+    show(k.el, o * wallOut);
+    // on the wall the whole page scrolls slowly inside its frame
+    const dist = Math.max(0, k.img.naturalHeight * (w / k.img.naturalWidth) - h);
+    k.img.style.transform = `translateY(${-dist * wave(Math.max(0, (t - 29.7 - i * .3) / 15))}px)`;   // all start at the top, then drift one after another
+    const wl = seg(t, 29.15 + i * .04, 29.65 + i * .04);
+    show(k.wl, wl); k.wl.style.top = (h + 14) + 'px'; k.wl.style.transform = `translateY(${lerp(8, 0, eo(wl))}px)`;
+  }
+  const wc = Math.min(seg(t, 28.7, 29.4), wallOut);
+  show($('w-run'), wc); show($('w-head'), wc); $('w-head').style.transform = `translateY(${lerp(14, 0, eo(seg(t, 28.7, 29.4)))}px)`;
+
+  // ----- D. detail view -----
+  const dIn = eo(seg(t, 31.55, 32.15)), dOut = seg(t, 38.0, 38.45), dv = dIn * (1 - dOut);
+  show($('veil'), .86 * dv);
+  show($('dlg'), dv); $('dlg').style.transform = `translateY(${lerp(34, 0, dIn)}px) scale(${lerp(.985, 1, dIn)})`;
+  $('d-img').style.transform = `translateY(${-640 * eio(seg(t, 32.5, 35.0))}px)`;
+  const pressed = t >= 35.6 && t < 37.9;
+  if ($('d-apply-t').textContent !== (pressed ? 'Copied' : 'Apply this variant')) $('d-apply-t').textContent = pressed ? 'Copied' : 'Apply this variant';
+  $('d-apply').style.transform = `scale(${1 - .04 * win(t, 35.55, 35.8, .1)})`;
+  if (!applyRect && t > 32.3 && t < 38) { const r = $('d-apply').getBoundingClientRect(); applyRect = { x: r.left + r.width * .5, y: r.top + r.height * .55 }; }
+
+  // ----- E. before and after -----
+  const baIn = eo(seg(t, 39.3, 40.0)), baOut = eio(seg(t, 44.7, 45.3));
+  show($('ba'), baIn * (1 - baOut)); $('ba').style.transform = `translateY(${lerp(26, 0, baIn)}px)`;
+  const wp = eio(seg(t, 42.3, 43.5));
+  $('ba-after').style.clipPath = `inset(0 ${100 * (1 - wp)}% 0 0)`;
+  $('ba-line').style.left = (wp * 100) + '%'; $('ba-line').style.opacity = wp > 0 && wp < 1 ? 1 : 0;
+  if ($('ba-tag').textContent !== (wp > .5 ? 'after' : 'before')) $('ba-tag').textContent = wp > .5 ? 'after' : 'before';
+  show($('ba-note'), seg(t, 43.5, 44.0));
+
+  // ----- F. end -----
+  show($('end'), t > 45.1 ? 1 : 0);
+  const ein = (el, a) => { const p = eo(seg(t, a, a + .7)); el.style.opacity = p; el.style.transform = `translateY(${lerp(24, 0, p)}px)`; };
+  ein($('e-brand'), 45.3); ein($('e-1'), 45.7); ein($('e-2'), 46.3); ein($('e-cmd'), 47.0); ein($('e-foot'), 47.4);
+
+  // ----- captions -----
+  let co = 0;
+  for (const [a, b, s] of CAPS) { const o = win(t, a, b, .3); if (o > co) { co = o; if ($('cap').dataset.s !== s) { $('cap').dataset.s = s; $('cap-t').innerHTML = s; } } }
+  show($('cap'), co); $('cap').style.transform = `translateY(${(1 - eo(co)) * 14}px)`;
+
+  // ----- cursor -----
+  const A = { x: 1560, y: 1030 }, B = { x: wslot(3).x + 250, y: wslot(3).y + 130 }, C = { x: 900, y: 600 }, D = applyRect ?? { x: 1470, y: 975 };
+  let cx = A.x, cy = A.y;
+  const mv = (p, P, Q) => { cx = lerp(P.x, Q.x, eio(p)); cy = lerp(P.y, Q.y, eio(p)) - Math.sin(Math.PI * p) * 26; };
+  if (t < 31.6) mv(seg(t, 30.3, 31.2), A, B); else if (t < 34.3) mv(seg(t, 32.0, 33.0), B, C); else mv(seg(t, 34.4, 35.35), C, D);
+  show($('cursor'), Math.min(seg(t, 30.2, 30.5), 1 - seg(t, 37.6, 38.0)));
+  $('cursor').style.transform = `translate(${cx}px, ${cy}px)`;
+  const rp = Math.max(win(t, 31.4, 31.9, .01) ? seg(t, 31.4, 31.9) : 0, win(t, 35.55, 36.05, .01) ? seg(t, 35.55, 36.05) : 0);
+  $('ripple').style.opacity = rp > 0 && rp < 1 ? .7 * (1 - rp) : 0; $('ripple').style.transform = `scale(${lerp(.3, 1.7, eo(rp))})`;
+}
+
+window.DURATION = DURATION;
+window.render = render;
+window.READY = (async () => {
+  await document.fonts.ready;
+  await Promise.all([...document.images].filter(i => i.src && i.id !== 'o-img').map(i => i.decode().catch(() => {})));
+  await Promise.all(['400 20px "Inter Tight"', '500 20px "Inter Tight"', '400 20px "JetBrains Mono"', '500 20px "JetBrains Mono"'].map(f => document.fonts.load(f)));
+  const at = new URLSearchParams(location.search).get('t');
+  await render(at ? Number(at) : 0);
+  return true;
+})();
+</script>
+</body>
+</html>

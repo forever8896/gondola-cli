@@ -1,0 +1,20 @@
+{
+  "angles": [
+    { "id": "outcome", "name": "Outcome led", "how": "Lead with what the reader gets or becomes, not with what the product is. Features appear only as the reason the outcome is believable." },
+    { "id": "proof", "name": "Proof led", "how": "Lead with the strongest concrete fact the repo already contains (a number, a named customer, a result). Claims without evidence are cut or moved down." },
+    { "id": "problem", "name": "Problem led", "how": "Open by naming the reader's problem in their own words, precisely enough that they feel recognised. The product arrives as the answer." },
+    { "id": "story", "name": "Story led", "how": "Tell it as a short sequence: where the reader is now, what changes, where they end up. Each block moves the story one step." },
+    { "id": "contrarian", "name": "Contrarian", "how": "Open by disagreeing with the usual way of doing this, then show the alternative. Confident, never insulting, and only claims the content supports." },
+    { "id": "plain", "name": "Radically plain", "how": "Say exactly what it is and what it costs or takes, in the fewest ordinary words. No slogans, no adjectives that could be deleted." },
+    { "id": "specific", "name": "Hyper specific", "how": "Replace every general statement with the most specific true detail available: who it is for, how long it takes, what exactly happens." },
+    { "id": "question", "name": "Question led", "how": "Headlines are the questions a sceptical reader would ask; the text under each answers it directly in one or two sentences." }
+  ],
+  "voices": [
+    { "id": "dry", "name": "Dry and precise", "how": "Short declarative sentences. No exclamation marks. Understatement over enthusiasm." },
+    { "id": "warm", "name": "Warm and direct", "how": "Talks to one person as 'you'. Friendly, plain, like a helpful colleague." },
+    { "id": "technical", "name": "Technical", "how": "Written for a practitioner: exact terms, concrete mechanisms, no marketing vocabulary." },
+    { "id": "bold", "name": "Bold", "how": "Punchy, rhythmic, confident. Very short headlines. Still only says what is true." },
+    { "id": "editorial", "name": "Editorial", "how": "Reads like a well-edited magazine: a considered headline, a standfirst, measured sentences." },
+    { "id": "playful", "name": "Playful", "how": "Light and a little witty, one small joke at most per screen, never at the reader's expense." }
+  ]
+}

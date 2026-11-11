@@ -1,0 +1,20 @@
+[
+  { "id": "single-statement", "name": "Single statement", "idea": "One enormous headline carries the whole section; everything else is small, quiet and precisely aligned beneath it." },
+  { "id": "editorial-split", "name": "Editorial split", "idea": "Two unequal columns like a magazine spread: a narrow column of labels and a wide column of content, with a strong vertical rule or margin between them." },
+  { "id": "bento", "name": "Bento grid", "idea": "Content broken into tiles of clearly different sizes on one grid; the most important tile is at least twice the size of any other." },
+  { "id": "comparison-table", "name": "Comparison table", "idea": "The content laid out as a real table or matrix the eye can scan in rows and columns, with one row or column emphasised." },
+  { "id": "narrative-scroll", "name": "Narrative scroll", "idea": "A sequence of short full-width beats, one idea per screen, that reads top to bottom like a story with a clear ending and call to action." },
+  { "id": "numbered-steps", "name": "Numbered steps", "idea": "Content reorganised as a numbered sequence (01, 02, 03) with large numerals as the main graphic device." },
+  { "id": "sticky-rail", "name": "Sticky rail", "idea": "A side rail (title, summary or call to action) that stays in place while the detail scrolls past it. Falls back to a normal stack on phones." },
+  { "id": "interactive-switch", "name": "Interactive switch", "idea": "One compact stage whose content changes with a toggle, tabs or a slider, so the visitor explores options instead of scrolling a list. Must work with the keyboard." },
+  { "id": "proof-first", "name": "Proof first", "idea": "Lead with the strongest existing evidence (numbers, logos, quotes, results) at full scale; the explanation comes second and smaller." },
+  { "id": "list-minimal", "name": "Minimal list", "idea": "No cards and no boxes: a plain, beautifully spaced list with hairline dividers, where typography alone creates the hierarchy." },
+  { "id": "asymmetric-poster", "name": "Asymmetric poster", "idea": "Deliberately off-centre composition with large empty space on one side and tightly packed content on the other, like a printed poster." },
+  { "id": "spec-sheet", "name": "Spec sheet", "idea": "Content presented as a technical data sheet: label and value pairs, small caps or monospace labels, dense but perfectly aligned." },
+  { "id": "media-led", "name": "Media led", "idea": "The existing imagery or illustration is the hero at its natural shape; text is arranged around it and never on top of it." },
+  { "id": "question-led", "name": "Question led", "idea": "Organised around the questions a visitor actually has; each block opens with the question and answers it in one or two lines." },
+  { "id": "stacked-cards", "name": "Stacked cards", "idea": "Large cards that overlap or stack as the page scrolls, one in focus at a time, each with one clear point." },
+  { "id": "timeline", "name": "Timeline", "idea": "Content placed along a visible horizontal or vertical line (before and after, now and next, or chronological order)." },
+  { "id": "dense-dashboard", "name": "Dense dashboard", "idea": "High information density done well: many small, well-labelled modules visible at once, for a visitor who wants everything on one screen." },
+  { "id": "centered-calm", "name": "Centred and calm", "idea": "A narrow centred column with generous white space, one accent, and a single obvious next action. Nothing decorative." }
+]
